@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Urban Rush</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="tap_to_play">Tap to Play</string>
+    <string name="your_record">Your Record</string>
+    <string name="game_paused">Game Paused</string>
+    <string name="continues">Continue</string>
+    <string name="home">Home</string>
+    <string name="distance">Distance</string>
+    <string name="menu">Menu</string>
+</resources>

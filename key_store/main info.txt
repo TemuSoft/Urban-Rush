@@ -1,0 +1,7 @@
+Name: Urban Rush
+password: u95ushUR26
+Alias: urban_rush
+Package ID: com.UrbanRush.UR2606
+Application version: 1.0
+Build version: 1
+Min SDK version: 21

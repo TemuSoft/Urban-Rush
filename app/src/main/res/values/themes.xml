@@ -1,0 +1,37 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.UrbanRush" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.UrbanRush" parent="Base.Theme.UrbanRush" />
+
+    <style name="text0Theme">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">24dp</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="fontFamily">@font/rem</item>
+    </style>
+
+    <style name="text1Theme">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">45dp</item>
+        <item name="android:textColor">@color/coffee</item>
+        <item name="fontFamily">@font/rem</item>
+    </style>
+
+    <style name="text2Theme">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontFamily">@font/rem</item>
+    </style>
+
+    <style name="text3Theme">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">21dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="fontFamily">@font/rem</item>
+    </style>
+</resources>
