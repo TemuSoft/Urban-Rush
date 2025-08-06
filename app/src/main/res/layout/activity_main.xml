@@ -72,16 +72,23 @@
 
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/play"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/btn_bg_green"
         android:gravity="center|bottom"
         android:paddingBottom="50dp"
-        android:text="@string/tap_to_play"
-        android:theme="@style/text1Theme"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tap_to_play"
+            android:theme="@style/text1Theme" />
+    </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

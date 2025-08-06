@@ -8,4 +8,6 @@
     <string name="home">Home</string>
     <string name="distance">Distance</string>
     <string name="menu">Menu</string>
+    <string name="game_over">Game Over</string>
+    <string name="again">Again</string>
 </resources>
