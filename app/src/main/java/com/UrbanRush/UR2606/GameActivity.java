@@ -118,6 +118,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                 if (alert_is_on_pause) {
                     long gap = System.currentTimeMillis() - pause_time;
                     start_time += gap;
+                    gameView.last_animate_time += gap;
 
                     layout_blur.setVisibility(GONE);
                     layout_dialog.setVisibility(GONE);
@@ -149,7 +150,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
             public void run() {
                 if (gameView.isPlaying) {
                     gameView.update();
-                    time.setText(Player.convert((int) (System.currentTimeMillis() - start_time)));
+                    time.setText(Player.convert((int) (System.currentTimeMillis() - start_time) / 1000));
                     if (gameView.life_remain > 2) {
                         heart_0.setImageResource(R.drawable.heart_1);
                         heart_1.setImageResource(R.drawable.heart_1);
@@ -234,7 +235,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
 
     private void game_over() {
-        int time_value = (int) (System.currentTimeMillis() - start_time);
+        int time_value = (int) (System.currentTimeMillis() - start_time) / 1000;
         editor.putInt("game_time", time_value);
         editor.apply();
 
@@ -279,6 +280,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         if (pause_time != 0) {
             long gap = System.currentTimeMillis() - pause_time;
             start_time += gap;
+            gameView.last_animate_time += gap;
         }
 
         reloading_UI();
@@ -286,7 +288,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onBackPressed() {
-        finishAffinity();
         return;
     }
 

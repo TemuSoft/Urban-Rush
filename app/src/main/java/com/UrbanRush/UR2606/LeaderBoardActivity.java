@@ -40,6 +40,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
         game_time = sharedPreferences.getInt("game_time", 0);
 
         setContentView(R.layout.activity_leader_board);
+        random = new Random();
 
         inflate = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         layout_vertical = findViewById(R.id.layout_vertical);
@@ -69,8 +70,8 @@ public class LeaderBoardActivity extends AppCompatActivity {
         ArrayList<Integer> data = new ArrayList<>();
         data.add(game_time);
 
-        for (int i = 0; i < 5; i++) {
-            int value = 120 + random.nextInt(game_time + 180);
+        for (int i = 0; i < 10; i++) {
+            int value = 600 + random.nextInt(game_time + 300);
             if (random.nextInt(100) == 49)
                 value = random.nextInt(game_time);
 
@@ -83,6 +84,11 @@ public class LeaderBoardActivity extends AppCompatActivity {
         data.remove(index);
 
         number.setText("#" + (index + 1));
+        if (index == 10) {
+            if (game_time == 0)
+                number.setText("#No play yet!");
+            else number.setText("#" + random.nextInt(1000));
+        }
         name.setText("You");
         best_time.setText(Player.convert(game_time));
 

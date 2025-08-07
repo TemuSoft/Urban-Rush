@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -33,13 +34,16 @@ public class MainActivity extends AppCompatActivity {
         soundMute = sharedPreferences.getBoolean("soundMute", false);
         lang = sharedPreferences.getString("lang", "");
         int best_time = sharedPreferences.getInt("best_time", 0);
-        time.setText(Player.convert(best_time));
 
         setContentView(R.layout.activity_main);
 
         leaderboard = findViewById(R.id.leaderboard);
         time = findViewById(R.id.time);
         play = findViewById(R.id.play);
+        time.setText(Player.convert(best_time));
+
+        Player.all_screens(this, R.raw.all_screens);
+        Player.button(this, R.raw.button);
 
         leaderboard.setOnClickListener(new View.OnClickListener() {
             @Override
