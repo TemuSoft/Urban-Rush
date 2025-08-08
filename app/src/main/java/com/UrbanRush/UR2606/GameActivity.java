@@ -119,6 +119,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                     long gap = System.currentTimeMillis() - pause_time;
                     start_time += gap;
                     gameView.last_animate_time += gap;
+                    gameView.last_jump_down_time += gap;
+                    gameView.game_over_time += gap;
 
                     layout_blur.setVisibility(GONE);
                     layout_dialog.setVisibility(GONE);
@@ -149,7 +151,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         Runnable r = new Runnable() {
             public void run() {
                 if (gameView.isPlaying) {
-                    gameView.update();
+                    if (!gameView.game_over) gameView.update();
+
                     time.setText(Player.convert((int) (System.currentTimeMillis() - start_time) / 1000));
                     if (gameView.life_remain > 2) {
                         heart_0.setImageResource(R.drawable.heart_1);
@@ -159,11 +162,12 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         heart_0.setImageResource(R.drawable.heart_1);
                         heart_1.setImageResource(R.drawable.heart_1);
                         heart_2.setImageResource(R.drawable.heart_0);
-                    } else if (gameView.life_remain > 2) {
+                    } else if (gameView.life_remain > 0) {
                         heart_0.setImageResource(R.drawable.heart_1);
                         heart_1.setImageResource(R.drawable.heart_0);
                         heart_2.setImageResource(R.drawable.heart_0);
-                    } else if (gameView.life_remain < 1) {
+                    } else if (gameView.game_over && gameView.game_over_time + gameView.duration < System.currentTimeMillis()) {
+                        alert_is_on_pause = false;
                         game_over();
                     }
 
@@ -235,6 +239,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
 
     private void game_over() {
+        gameView.isPlaying = false;
         int time_value = (int) (System.currentTimeMillis() - start_time) / 1000;
         editor.putInt("game_time", time_value);
         editor.apply();
@@ -281,6 +286,8 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
             long gap = System.currentTimeMillis() - pause_time;
             start_time += gap;
             gameView.last_animate_time += gap;
+            gameView.last_jump_down_time += gap;
+            gameView.game_over_time += gap;
         }
 
         reloading_UI();
@@ -298,25 +305,47 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                processActionDown(x, y);
+                if (!gameView.game_over) processActionDown(x, y);
                 break;
             case MotionEvent.ACTION_MOVE:
-                processActionMove(x, y);
+                if (!gameView.game_over) processActionMove(x, y);
                 break;
             case MotionEvent.ACTION_UP:
-                processActionUp(x, y);
+                if (!gameView.game_over) processActionUp(x, y);
                 break;
         }
         return true;
     }
 
     private void processActionDown(int x, int y) {
-
+        gameView.tap_x = x;
+        gameView.tap_y = y;
     }
 
     private void processActionUp(int xp, int yp) {
         Rect clicked = new Rect(xp, yp, xp, yp);
+        int min_dix = gameView.r_h;
+        int x_dif = xp - gameView.tap_x;
+        int y_dif = yp - gameView.tap_y;
 
+        if (Math.abs(x_dif) > Math.abs(y_dif) && Math.abs(x_dif) > min_dix) {
+            if (x_dif > 0) gameView.move_left = -1;
+            else gameView.move_left = 1;
+        } else if (Math.abs(y_dif) > Math.abs(x_dif) && Math.abs(y_dif) > min_dix) {
+            if (y_dif > 0) {
+                gameView.move_up = 1;
+                gameView.on_jumping_down = true;
+                gameView.on_jumping_up = false;
+                gameView.last_jump_down_time = System.currentTimeMillis();
+            } else {
+                gameView.move_up = -1;
+                gameView.on_jumping_up = true;
+                gameView.on_jumping_down = false;
+            }
+        }
+
+        gameView.tap_x = -1;
+        gameView.tap_y = -1;
     }
 
     private void processActionMove(int x, int y) {
