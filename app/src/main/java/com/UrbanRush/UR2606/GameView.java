@@ -43,8 +43,7 @@ public class GameView extends View {
     int jigsaw_y, jigsaw_w, jigsaw_h;
 
     ArrayList<Integer> road_x = new ArrayList<>();
-    ArrayList<ArrayList<Integer>> iron_data = new ArrayList<>();
-    ArrayList<ArrayList<Integer>> jigsaw_data = new ArrayList<>();
+    ArrayList<ArrayList<Integer>> iron_jigsaw_data = new ArrayList<>();
     ArrayList<ArrayList<Integer>> house_data = new ArrayList<>();
 
     public GameView(Context mContext, int scX, int scY, Resources res, int level_amount) {
@@ -185,60 +184,64 @@ public class GameView extends View {
     }
 
     private void add_iron() {
-        int s = iron_data.size();
-        int gap = screenX + random.nextInt(screenX);
+        int s = iron_jigsaw_data.size();
+        int gap = screenX / 2 + random.nextInt(screenX);
         int direction = (random.nextBoolean() ? -1 : 1);
         int x;
         ArrayList<Integer> data = new ArrayList<>();
 
         if (move_left == -1) {
             if (s > 0) {
-                x = iron_data.get(s - 1).get(0) + gap;
+                x = iron_jigsaw_data.get(s - 1).get(0) + gap;
             } else {
                 x = screenX + gap;
             }
             data.add(x);
             data.add(direction);
-            iron_data.add(data);
+            data.add(0);
+            iron_jigsaw_data.add(data);
 
         } else if (move_left == 1) {
             if (s > 0) {
-                x = iron_data.get(0).get(0) - gap;
+                x = iron_jigsaw_data.get(0).get(0) - gap;
             } else {
                 x = -gap - iron_w;
             }
             data.add(x);
             data.add(direction);
-            iron_data.add(0, data);
+            data.add(0);
+            iron_jigsaw_data.add(0, data);
         }
     }
 
     private void add_jigsaw() {
-        int s = jigsaw_data.size();
-        int gap = screenX + random.nextInt(screenX);
+        int s = iron_jigsaw_data.size();
+        int gap = screenX / 2 + random.nextInt(screenX);
         int direction = (random.nextBoolean() ? -1 : 1);
         int x;
         ArrayList<Integer> data = new ArrayList<>();
 
         if (move_left == -1) {
             if (s > 0) {
-                x = jigsaw_data.get(s - 1).get(0) + gap;
+                x = iron_jigsaw_data.get(s - 1).get(0) + gap;
             } else {
                 x = screenX + gap;
             }
             data.add(x);
             data.add(direction);
-            jigsaw_data.add(data);
+            data.add(1);
+            iron_jigsaw_data.add(data);
 
         } else if (move_left == 1) {
             if (s > 0) {
-                x = jigsaw_data.get(0).get(0) - gap;
+                x = iron_jigsaw_data.get(0).get(0) - gap;
             } else {
                 x = -gap - jigsaw_w;
             }
             data.add(x);
             data.add(direction);
-            jigsaw_data.add(0, data);
+            data.add(1);
+            iron_jigsaw_data.add(0, data);
         }
     }
 
@@ -263,33 +266,27 @@ public class GameView extends View {
             canvas.drawBitmap(houses.get(index), x, y, paint);
         }
 
-        canvas.drawRect(0, max_man_y_jum, screenX, max_man_y_jum + 10, paint);
-
         canvas.save();
         canvas.scale(move_left * -1, 1, m_x + man_w / 2, m_y + man_h / 2);
         canvas.drawBitmap(man.get(man_index), m_x, m_y, paint);
         canvas.restore();
 
-        for (int i = 0; i < iron_data.size(); i++) {
-            int x = iron_data.get(i).get(0);
-            int direction = iron_data.get(i).get(1);
-
-            if (x > screenX || x + iron_w < 0) continue;
-
-            canvas.save();
-            canvas.scale(direction, 1, x + iron_w / 2, iron_y + iron_h / 2);
-            canvas.drawBitmap(iron, x, iron_y, paint);
-            canvas.restore();
-        }
-        for (int i = 0; i < jigsaw_data.size(); i++) {
-            int x = jigsaw_data.get(i).get(0);
-            int direction = jigsaw_data.get(i).get(1);
-
-            if (x > screenX || x + jigsaw_w < 0) continue;
+        for (int i = 0; i < iron_jigsaw_data.size(); i++) {
+            int x = iron_jigsaw_data.get(i).get(0);
+            int direction = iron_jigsaw_data.get(i).get(1);
+            int type = iron_jigsaw_data.get(i).get(2);
+            boolean iii = x > screenX || x + iron_w < 0;
+            boolean jjj = x > screenX || x + jigsaw_w < 0;
+            if (iii || jjj) continue;
 
             canvas.save();
-            canvas.scale(direction, 1, x + jigsaw_w / 2, jigsaw_y + jigsaw_h / 2);
-            canvas.drawBitmap(jigsaw, x, jigsaw_y, paint);
+            if (type == 0) {
+                canvas.scale(direction, 1, x + iron_w / 2, iron_y + iron_h / 2);
+                canvas.drawBitmap(iron, x, iron_y, paint);
+            } else {
+                canvas.scale(direction, 1, x + jigsaw_w / 2, jigsaw_y + jigsaw_h / 2);
+                canvas.drawBitmap(jigsaw, x, jigsaw_y, paint);
+            }
             canvas.restore();
         }
     }
@@ -354,17 +351,11 @@ public class GameView extends View {
             x += xSpeed * move_left;
             road_x.set(i, x);
         }
-        for (int i = 0; i < iron_data.size(); i++) {
-            int x = iron_data.get(i).get(0);
+        for (int i = 0; i < iron_jigsaw_data.size(); i++) {
+            int x = iron_jigsaw_data.get(i).get(0);
 
             x += xSpeed * move_left;
-            iron_data.get(i).set(0, x);
-        }
-        for (int i = 0; i < jigsaw_data.size(); i++) {
-            int x = jigsaw_data.get(i).get(0);
-
-            x += xSpeed * move_left;
-            jigsaw_data.get(i).set(0, x);
+            iron_jigsaw_data.get(i).set(0, x);
         }
         for (int i = 0; i < house_data.size(); i++) {
             int x = house_data.get(i).get(0);
@@ -381,14 +372,16 @@ public class GameView extends View {
                 add_road();
             }
 
-            if (iron_data.get(0).get(0) + iron_w < 0) {
-                iron_data.remove(0);
-                add_iron();
-            }
-
-            if (jigsaw_data.get(0).get(0) + jigsaw_w < 0) {
-                jigsaw_data.remove(0);
-                add_jigsaw();
+            if (iron_jigsaw_data.get(0).get(2) == 0) {
+                if (iron_jigsaw_data.get(0).get(0) + iron_w < 0) {
+                    iron_jigsaw_data.remove(0);
+                    add_iron();
+                }
+            } else if (iron_jigsaw_data.get(0).get(2) == 1) {
+                if (iron_jigsaw_data.get(0).get(0) + jigsaw_w < 0) {
+                    iron_jigsaw_data.remove(0);
+                    add_jigsaw();
+                }
             }
 
             if (house_data.get(0).get(0) + houses.get(house_data.get(0).get(2)).getWidth() < 0) {
@@ -401,14 +394,16 @@ public class GameView extends View {
                 add_road();
             }
 
-            if (iron_data.get(iron_data.size() - 1).get(0) > screenX) {
-                iron_data.remove(iron_data.size() - 1);
-                add_iron();
-            }
-
-            if (jigsaw_data.get(jigsaw_data.size() - 1).get(0) > screenX) {
-                jigsaw_data.remove(jigsaw_data.size() - 1);
-                add_jigsaw();
+            if (iron_jigsaw_data.get(iron_jigsaw_data.size() - 1).get(2) == 0) {
+                if (iron_jigsaw_data.get(iron_jigsaw_data.size() - 1).get(0) > screenX) {
+                    iron_jigsaw_data.remove(iron_jigsaw_data.size() - 1);
+                    add_iron();
+                }
+            } else if (iron_jigsaw_data.get(iron_jigsaw_data.size() - 1).get(2) == 1) {
+                if (iron_jigsaw_data.get(iron_jigsaw_data.size() - 1).get(0) > screenX) {
+                    iron_jigsaw_data.remove(iron_jigsaw_data.size() - 1);
+                    add_jigsaw();
+                }
             }
 
             if (house_data.get(house_data.size() - 1).get(0) > screenX) {
@@ -419,24 +414,19 @@ public class GameView extends View {
     }
 
     private void check_intersection() {
-        for (int i = 0; i < iron_data.size(); i++) {
-            int x = iron_data.get(i).get(0);
+        for (int i = 0; i < iron_jigsaw_data.size(); i++) {
+            int x = iron_jigsaw_data.get(i).get(0);
             Rect iron = new Rect(x, iron_y, x + iron_w, iron_y + iron_h);
-
-            if (Rect.intersects(getPlayerCollision(), iron)) {
-                life_remain--;
-                iron_data.remove(i);
-                add_iron();
-                break;
-            }
-        }
-        for (int i = 0; i < jigsaw_data.size(); i++) {
-            int x = jigsaw_data.get(i).get(0);
             Rect jigsaw = new Rect(x, jigsaw_y, x + jigsaw_w, jigsaw_y + jigsaw_h);
 
-            if (Rect.intersects(getPlayerCollision(), jigsaw)) {
+            if (Rect.intersects(getPlayerCollision(), iron) && iron_jigsaw_data.get(i).get(0) == 0) {
                 life_remain--;
-                jigsaw_data.remove(i);
+                iron_jigsaw_data.remove(i);
+                add_iron();
+                break;
+            } else if (Rect.intersects(getPlayerCollision(), jigsaw) && iron_jigsaw_data.get(i).get(0) == 1) {
+                life_remain--;
+                iron_jigsaw_data.remove(i);
                 add_jigsaw();
                 break;
             }
