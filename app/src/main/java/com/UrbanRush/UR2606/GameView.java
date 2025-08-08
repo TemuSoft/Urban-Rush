@@ -35,9 +35,9 @@ public class GameView extends View {
     boolean on_jumping_up, on_jumping_down;
     ArrayList<Bitmap> houses = new ArrayList<>();
     ArrayList<Bitmap> man = new ArrayList<>();
-    Bitmap road, iron, jigsaw;
+    Bitmap road, iron, jigsaw, tree;
     int r_y, r_w, r_h, move_left = -1, move_up = 0;
-    int m_x, m_y, m_c_x;
+    int m_x, m_y, m_c_x, tree_w, tree_h;
     int man_w, man_h, man_ground_original, man_ground;
     int iron_y, iron_w, iron_h;
     int jigsaw_y, jigsaw_w, jigsaw_h;
@@ -45,6 +45,7 @@ public class GameView extends View {
     ArrayList<Integer> road_x = new ArrayList<>();
     ArrayList<ArrayList<Integer>> iron_jigsaw_data = new ArrayList<>();
     ArrayList<ArrayList<Integer>> house_data = new ArrayList<>();
+    ArrayList<Integer> tree_x = new ArrayList<>();
 
     public GameView(Context mContext, int scX, int scY, Resources res, int level_amount) {
         super(mContext);
@@ -57,12 +58,14 @@ public class GameView extends View {
         road = BitmapFactory.decodeResource(res, R.drawable.road);
         iron = BitmapFactory.decodeResource(res, R.drawable.iron);
         jigsaw = BitmapFactory.decodeResource(res, R.drawable.jigsaw);
+        tree = BitmapFactory.decodeResource(res, R.drawable.tree);
 
         init_size(res);
 
         iron = Bitmap.createScaledBitmap(iron, iron_w, iron_h, false);
         jigsaw = Bitmap.createScaledBitmap(jigsaw, jigsaw_w, jigsaw_h, false);
         road = Bitmap.createScaledBitmap(road, r_w, r_h, false);
+        tree = Bitmap.createScaledBitmap(tree, tree_w, tree_h, false);
 
         setSpeed();
         for (int i = 0; i < 3; i++)
@@ -72,6 +75,7 @@ public class GameView extends View {
             add_house();
             add_iron();
             add_jigsaw();
+            add_tree();
         }
     }
 
@@ -106,18 +110,25 @@ public class GameView extends View {
             man.add(Bitmap.createScaledBitmap(bitmap, w, h, false));
         }
 
-        int max_h = r_h * 3 / 4;
+        int max_h_i_j = r_h * 3 / 4;
         iron_w = iron.getWidth();
         iron_h = iron.getHeight();
-        if (iron_h > max_h) {
-            iron_w = iron_w * max_h / iron_h;
-            iron_h = max_h;
+        if (iron_h > max_h_i_j) {
+            iron_w = iron_w * max_h_i_j / iron_h;
+            iron_h = max_h_i_j;
         }
         jigsaw_w = iron.getWidth();
         jigsaw_h = iron.getHeight();
-        if (jigsaw_h > max_h) {
-            jigsaw_w = jigsaw_w * max_h / jigsaw_h;
-            jigsaw_h = max_h;
+        if (jigsaw_h > max_h_i_j) {
+            jigsaw_w = jigsaw_w * max_h_i_j / jigsaw_h;
+            jigsaw_h = max_h_i_j;
+        }
+
+        tree_w = tree.getWidth();
+        tree_h = tree.getHeight();
+        if (tree_h > max_h) {
+            tree_w = tree_w * max_h / tree_h;
+            tree_h = max_h;
         }
 
         jigsaw_y = screenY - r_h / 2 - jigsaw_h / 2;
@@ -245,6 +256,20 @@ public class GameView extends View {
         }
     }
 
+    private void add_tree() {
+        int s = tree_x.size();
+        int gap = screenX + random.nextInt(screenX);
+        if (move_left == -1) {
+            int last_x = screenX;
+            if (s > 0) last_x = tree_x.get(s - 1) + tree_w + gap;
+            tree_x.add(last_x);
+        } else if (move_left == 1) {
+            int first_x = -tree_w - gap;
+            if (s > 0) first_x = tree_x.get(0) - tree_h - gap;
+            tree_x.add(0, first_x);
+        }
+    }
+
     public void onDraw(Canvas canvas) {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
@@ -288,6 +313,13 @@ public class GameView extends View {
                 canvas.drawBitmap(jigsaw, x, jigsaw_y, paint);
             }
             canvas.restore();
+        }
+
+        for (int i = 0; i < tree_x.size(); i++) {
+            int x = tree_x.get(i);
+            if (x > screenX || x + tree_w < 0) continue;
+
+            canvas.drawBitmap(tree, x, man_ground_original - tree_h, paint);
         }
     }
 
@@ -363,6 +395,11 @@ public class GameView extends View {
             x += xSpeed * move_left;
             house_data.get(i).set(0, x);
         }
+        for (int i = 0; i < tree_x.size(); i++) {
+            int x = tree_x.get(i);
+            x += xSpeed * move_left;
+            tree_x.set(i, x);
+        }
     }
 
     private void check_removed() {
@@ -388,6 +425,11 @@ public class GameView extends View {
                 house_data.remove(0);
                 add_house();
             }
+
+            if (tree_x.get(0) + tree_w < 0) {
+                tree_x.remove(0);
+                add_tree();
+            }
         } else if (move_left == 1) {
             if (road_x.get(road_x.size() - 1) > screenX) {
                 road_x.remove(road_x.size() - 1);
@@ -409,6 +451,11 @@ public class GameView extends View {
             if (house_data.get(house_data.size() - 1).get(0) > screenX) {
                 house_data.remove(house_data.size() - 1);
                 add_house();
+            }
+
+            if (tree_x.get(tree_x.size() - 1) > screenX) {
+                tree_x.remove(tree_x.size() - 1);
+                add_tree();
             }
         }
     }
