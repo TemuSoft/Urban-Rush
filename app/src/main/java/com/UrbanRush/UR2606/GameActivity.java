@@ -121,6 +121,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                     gameView.last_animate_time += gap;
                     gameView.last_jump_down_time += gap;
                     gameView.game_over_time += gap;
+                    gameView.last_open_hatch_intersection_time += gap;
 
                     layout_blur.setVisibility(GONE);
                     layout_dialog.setVisibility(GONE);
@@ -151,7 +152,6 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
         Runnable r = new Runnable() {
             public void run() {
                 if (gameView.isPlaying) {
-                    if (!gameView.game_over) gameView.update();
 
                     time.setText(Player.convert((int) (System.currentTimeMillis() - start_time) / 1000));
                     if (gameView.life_remain > 2) {
@@ -166,11 +166,18 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
                         heart_0.setImageResource(R.drawable.heart_1);
                         heart_1.setImageResource(R.drawable.heart_0);
                         heart_2.setImageResource(R.drawable.heart_0);
-                    } else if (gameView.game_over && gameView.game_over_time + gameView.duration < System.currentTimeMillis()) {
+                    }else {
+                        heart_0.setImageResource(R.drawable.heart_0);
+                        heart_1.setImageResource(R.drawable.heart_0);
+                        heart_2.setImageResource(R.drawable.heart_0);
+                    }
+
+                    if (gameView.game_over && gameView.game_over_time + gameView.duration < System.currentTimeMillis()) {
                         alert_is_on_pause = false;
                         game_over();
                     }
 
+                    if (!gameView.game_over) gameView.update();
                     reloading_UI();
                 }
             }
@@ -288,6 +295,7 @@ public class GameActivity extends AppCompatActivity implements View.OnTouchListe
             gameView.last_animate_time += gap;
             gameView.last_jump_down_time += gap;
             gameView.game_over_time += gap;
+            gameView.last_open_hatch_intersection_time += gap;
         }
 
         reloading_UI();
